@@ -57,10 +57,11 @@ public class HelloWorldClient {
 	/** Say hello to server. */
 	public void greet(String name) {
 		logger.info("Will try to greet " + name + " ...");
-		HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-		HelloReply response;
 
+		HelloRequest request;
+		HelloReply response;
 		try {
+			request = HelloRequest.newBuilder().setName(name).build();
 			response = blockingStub.sayHello(request);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
@@ -68,29 +69,41 @@ public class HelloWorldClient {
 		}
 		logger.info("Greeting: " + response.getMessage());
 
+		CreateWalletRequest createWalletRequest;
+		CreateWalletReply createWalletResponse;
 		try {
-			response = blockingStub.createWallet(request);
+			createWalletRequest = CreateWalletRequest.newBuilder().setPassword("").build();
+			createWalletResponse = blockingStub.createWallet(createWalletRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("Greeting: " + response.getMessage());
+		logger.info("pv key: " + createWalletResponse.getPrivatekey());
+		logger.info("pb key: " + createWalletResponse.getPublickey());
+		logger.info("did: " + createWalletResponse.getDid());
+		logger.info("address: " + createWalletResponse.getAddress());
 
+		CheckBalanceRequest checkBalanceRequest;
+		CheckBalanceReply checkBalanceReply;
 		try {
-			response = blockingStub.checkBalance(request);
+			checkBalanceRequest = CheckBalanceRequest.newBuilder().setAddress(createWalletResponse.getAddress()).build();
+			checkBalanceReply = blockingStub.checkBalance(checkBalanceRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("Greeting: " + response.getMessage());
+		logger.info("check balance: " + checkBalanceReply.getBalance());
 
+		SendIcxRequest sendIcxRequest;
+		SendIcxReply sendIcxReply;
 		try {
-			response = blockingStub.sendICX(request);
+			sendIcxRequest = SendIcxRequest.newBuilder().setPrivatekey(createWalletResponse.getPrivatekey()).build();
+			sendIcxReply = blockingStub.sendICX(sendIcxRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("Greeting: " + response.getMessage());
+		logger.info("send ICX: " + sendIcxReply.getMessage());
 	}
 
 	/**

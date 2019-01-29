@@ -17,12 +17,19 @@
 package io.grpc.examples.helloworld;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.logging.Logger;
 
+import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
+import foundation.icon.icx.data.Address;
+import foundation.icon.icx.transport.http.HttpProvider;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.examples.helloworld.data.CommonData;
 import io.grpc.stub.StreamObserver;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * Server that manages startup/shutdown of a {@code Greeter} server.
@@ -84,18 +91,43 @@ public class HelloWorldServer {
 		}
 
 		@Override
-		public void createWallet(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-			HelloReply reply = HelloReply.newBuilder().setMessage("Create wallet " + req.getName()).build();
+		public void createWallet(CreateWalletRequest req, StreamObserver<CreateWalletReply> responseObserver) {
+			CreateWalletReply reply = CreateWalletReply.newBuilder().setPrivatekey("").build();
 
 			// Create keyWallet and store it as a keyStorefile
 			System.out.println("Create KeyWallet");
 			KeyWallet createdWallet;
 			try {
 				createdWallet = KeyWallet.create();
-				System.out.println("address:" + createdWallet.getAddress());
-				System.out.println("privateKey:" + createdWallet.getPrivateKey().toHexString(false));
-				reply = HelloReply.newBuilder().setMessage(createdWallet.getAddress() + " " + req.getName()).build();
+				logger.info("address: " + createdWallet.getAddress());
+				reply = CreateWalletReply.newBuilder().setPrivatekey(createdWallet.getPrivateKey().toHexString(false))
+						.setPublickey(createdWallet.getPublicKey().toHexString(false))
+						.setDid(createdWallet.getPublicKey().toHexString(false))
+						.setAddress(createdWallet.getAddress().toString()).build();
 			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			responseObserver.onNext(reply);
+			responseObserver.onCompleted();
+		}
+
+		@Override
+		public void checkBalance(CheckBalanceRequest req, StreamObserver<CheckBalanceReply> responseObserver) {
+			CheckBalanceReply reply = CheckBalanceReply.newBuilder().setBalance("").build();
+
+			HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+			logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+			OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
+			IconService iconService = new IconService(new HttpProvider(httpClient, CommonData.URI4testnet));
+
+			Address address = new Address("hx11ff20b38b81f2c33ac61c3b9037f94cca167e7c");
+			BigInteger balance;
+			try {
+				balance = iconService.getBalance(address).execute();
+				System.out.println("Example_wallet balance:" + balance);
+				reply = CheckBalanceReply.newBuilder().setBalance(balance.toString()).build();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -105,15 +137,8 @@ public class HelloWorldServer {
 		}
 
 		@Override
-		public void checkBalance(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-			HelloReply reply = HelloReply.newBuilder().setMessage("Check balance " + req.getName()).build();
-			responseObserver.onNext(reply);
-			responseObserver.onCompleted();
-		}
-
-		@Override
-		public void sendICX(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-			HelloReply reply = HelloReply.newBuilder().setMessage("Send ICX " + req.getName()).build();
+		public void sendICX(SendIcxRequest req, StreamObserver<SendIcxReply> responseObserver) {
+			SendIcxReply reply = SendIcxReply.newBuilder().setMessage("Send ICX result = ").build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
 		}

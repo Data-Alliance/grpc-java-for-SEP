@@ -44,24 +44,8 @@ dependencies {
 
     compile "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 
-	compile files('jars-icon-sdk/apiguardian-api-1.0.0.jar')
-	compile files('jars-icon-sdk/bcprov-jdk15on-1.60.jar')
-	compile files('jars-icon-sdk/byte-buddy-1.8.10.jar')
-	compile files('jars-icon-sdk/byte-buddy-agent-1.8.10.jar')
-	compile files('jars-icon-sdk/icon-sdk-0.9.10.jar')
-	compile files('jars-icon-sdk/jackson-annotations-2.9.0.jar')
-	compile files('jars-icon-sdk/jackson-core-2.9.6.jar')
-	compile files('jars-icon-sdk/jackson-databind-2.9.6.jar')
-	compile files('jars-icon-sdk/junit-jupiter-api-5.2.0.jar')
-	compile files('jars-icon-sdk/junit-jupiter-engine-5.2.0.jar')
-	compile files('jars-icon-sdk/junit-platform-commons-1.2.0.jar')
-	compile files('jars-icon-sdk/junit-platform-engine-1.2.0.jar')
-	compile files('jars-icon-sdk/logging-interceptor-3.11.0.jar')
-	compile files('jars-icon-sdk/mockito-core-2.19.0.jar')
-	compile files('jars-icon-sdk/objenesis-2.6.jar')
-	compile files('jars-icon-sdk/okhttp-3.12.1.jar')
-	compile files('jars-icon-sdk/okio-1.14.0.jar')
-	compile files('jars-icon-sdk/opentest4j-1.1.0.jar')
+    compile 'org.json:json:20171018'
+    compile fileTree(dir: 'jars-icon-sdk', include: ['*.jar'])
 
     testCompile "io.grpc:grpc-testing:${grpcVersion}"
     testCompile "junit:junit:4.12"

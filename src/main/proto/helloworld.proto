@@ -26,21 +26,51 @@ service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 
   // Create wallet
-  rpc CreateWallet (HelloRequest) returns (HelloReply) {}
+  rpc CreateWallet (CreateWalletRequest) returns (CreateWalletReply) {}
 
   // Check balance
-  rpc CheckBalance (HelloRequest) returns (HelloReply) {}
+  rpc CheckBalance (CheckBalanceRequest) returns (CheckBalanceReply) {}
 
-  // Check balance
-  rpc SendICX (HelloRequest) returns (HelloReply) {}
+  // Send ICX
+  rpc SendICX (SendIcxRequest) returns (SendIcxReply) {}
 }
 
 // The request message containing the user's name.
 message HelloRequest {
   string name = 1;
 }
-// The response message containing the greetings
+// The response message containing the greetings.
 message HelloReply {
+  string message = 1;
+}
+
+// The request message containing the user's name.
+message CreateWalletRequest {
+  string password = 1;
+}
+// The response message containing the greetings.
+message CreateWalletReply {
+  string privatekey = 1;
+  string publickey = 2;
+  string did = 3;
+  string address = 4;
+}
+
+// The request message containing the user's private key.
+message CheckBalanceRequest {
+  string address = 1;
+}
+// The response message containing the balance.
+message CheckBalanceReply {
+  string balance = 1;
+}
+
+// The request message containing the user's private key.
+message SendIcxRequest {
+  string privatekey = 1;
+}
+// The response message containing the balance.
+message SendIcxReply {
   string message = 1;
 }
 
