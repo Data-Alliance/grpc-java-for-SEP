@@ -30,7 +30,6 @@ import foundation.icon.icx.data.Bytes;
 import foundation.icon.icx.transport.http.HttpProvider;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.examples.helloworld.data.CommonData;
 import io.grpc.stub.StreamObserver;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -95,8 +94,8 @@ public class HelloWorldServer {
 		}
 
 		@Override
-		public void createWallet(CreateWalletRequest req, StreamObserver<CreateWalletReply> responseObserver) {
-			CreateWalletReply reply = CreateWalletReply.newBuilder().setPrivatekey("").build();
+		public void createKeyWallet(CreateKeyWalletRequest req, StreamObserver<CreateKeyWalletReply> responseObserver) {
+			CreateKeyWalletReply reply = CreateKeyWalletReply.newBuilder().setPrivatekey("").build();
 
 			// Create keyWallet and store it as a keyStorefile
 			System.out.println("Create KeyWallet");
@@ -104,7 +103,7 @@ public class HelloWorldServer {
 			try {
 				createdWallet = KeyWallet.create();
 				logger.info("address: " + createdWallet.getAddress());
-				reply = CreateWalletReply.newBuilder().setPrivatekey(createdWallet.getPrivateKey().toHexString(false))
+				reply = CreateKeyWalletReply.newBuilder().setPrivatekey(createdWallet.getPrivateKey().toHexString(false))
 						.setPublickey(createdWallet.getPublicKey().toHexString(false))
 						.setDid(createdWallet.getPublicKey().toHexString(false))
 						.setAddress(createdWallet.getAddress().toString()).build();
@@ -117,9 +116,9 @@ public class HelloWorldServer {
 		}
 
 		@Override
-		public void createKeystoreFile(CreateKeystorefileRequest req,
-				StreamObserver<CreateKeystorefileReply> responseObserver) {
-			CreateKeystorefileReply reply = CreateKeystorefileReply.newBuilder().setKeystorefile("").build();
+		public void createKeystoreFile(CreateKeystoreFileRequest req,
+				StreamObserver<CreateKeystoreFileReply> responseObserver) {
+			CreateKeystoreFileReply reply = CreateKeystoreFileReply.newBuilder().setKeystorefile("").build();
 
 			// Create keyWallet and store it as a keyStorefile
 			System.out.println("Create KeyWallet");
@@ -142,7 +141,7 @@ public class HelloWorldServer {
 					keyStorefile = br.readLine();
 				}
 				logger.info("keyStorefile: " + keyStorefile);
-				reply = CreateKeystorefileReply.newBuilder().setKeystorefile(keyStorefile).build();
+				reply = CreateKeystoreFileReply.newBuilder().setKeystorefile(keyStorefile).build();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

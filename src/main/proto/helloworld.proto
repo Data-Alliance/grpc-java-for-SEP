@@ -25,11 +25,11 @@ service Greeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 
-  // Create wallet
-  rpc CreateWallet (CreateWalletRequest) returns (CreateWalletReply) {}
+  // Create keywallet
+  rpc CreateKeyWallet (CreateKeyWalletRequest) returns (CreateKeyWalletReply) {}
 
-  // Create keystore flie
-  rpc CreateKeystoreFile (CreateKeystorefileRequest) returns (CreateKeystorefileReply) {}
+  // CreatekKeystore flie
+  rpc CreateKeystoreFile (CreateKeystoreFileRequest) returns (CreateKeystoreFileReply) {}
 
   // Check balance
   rpc CheckBalance (CheckBalanceRequest) returns (CheckBalanceReply) {}
@@ -47,29 +47,30 @@ message HelloReply {
   string message = 1;
 }
 
-// The request message containing the user's name.
-message CreateWalletRequest {
+// The request message could be containing the password.
+message CreateKeyWalletRequest {
   string password = 1;
 }
-// The response message containing the greetings.
-message CreateWalletReply {
+// The response message containing the keywallet info.
+message CreateKeyWalletReply {
   string privatekey = 1;
   string publickey = 2;
   string did = 3;
   string address = 4;
+  string keystorefile = 5; //
 }
 
 // The request message containing the user's private key & password.
-message CreateKeystorefileRequest {
+message CreateKeystoreFileRequest {
   string privatekey = 1;
   string password = 2;
 }
 // The response message containing the keystorefile.
-message CreateKeystorefileReply {
+message CreateKeystoreFileReply {
   string keystorefile = 1;
 }
 
-// The request message containing the user's private key.
+// The request message containing the address.
 message CheckBalanceRequest {
   string address = 1;
 }
@@ -78,9 +79,10 @@ message CheckBalanceReply {
   string balance = 1;
 }
 
-// The request message containing the user's private key.
+// The request message containing the user's private key & send to address.
 message SendIcxRequest {
   string privatekey = 1;
+  string toAddress = 2;
 }
 // The response message containing the balance.
 message SendIcxReply {

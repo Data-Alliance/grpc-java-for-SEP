@@ -1,4 +1,4 @@
-package io.grpc.examples.helloworld.data;
+package io.grpc.examples.helloworld;
 
 import foundation.icon.icx.data.Address;
 

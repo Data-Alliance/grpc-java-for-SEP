@@ -69,25 +69,25 @@ public class HelloWorldClient {
 		}
 		logger.info("Greeting: " + response.getMessage());
 
-		CreateWalletRequest createWalletRequest;
-		CreateWalletReply createWalletResponse;
+		CreateKeyWalletRequest createKeyWalletRequest;
+		CreateKeyWalletReply createKeyWalletResponse;
 		try {
-			createWalletRequest = CreateWalletRequest.newBuilder().setPassword("").build();
-			createWalletResponse = blockingStub.createWallet(createWalletRequest);
+			createKeyWalletRequest = CreateKeyWalletRequest.newBuilder().setPassword("").build();
+			createKeyWalletResponse = blockingStub.createKeyWallet(createKeyWalletRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("pv key: " + createWalletResponse.getPrivatekey());
-		logger.info("pb key: " + createWalletResponse.getPublickey());
-		logger.info("did: " + createWalletResponse.getDid());
-		logger.info("address: " + createWalletResponse.getAddress());
+		logger.info("pv key: " + createKeyWalletResponse.getPrivatekey());
+		logger.info("pb key: " + createKeyWalletResponse.getPublickey());
+		logger.info("did: " + createKeyWalletResponse.getDid());
+		logger.info("address: " + createKeyWalletResponse.getAddress());
 
-		CreateKeystorefileRequest createKeystorefileRequest;
-		CreateKeystorefileReply createKeystorefileResponse;
+		CreateKeystoreFileRequest createKeystorefileRequest;
+		CreateKeystoreFileReply createKeystorefileResponse;
 		try {
-			createKeystorefileRequest = CreateKeystorefileRequest.newBuilder()
-					.setPrivatekey(createWalletResponse.getPrivatekey()).setPassword("Pa55w0rd").build();
+			createKeystorefileRequest = CreateKeystoreFileRequest.newBuilder()
+					.setPrivatekey(createKeyWalletResponse.getPrivatekey()).setPassword("Pa55w0rd").build();
 			createKeystorefileResponse = blockingStub.createKeystoreFile(createKeystorefileRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
@@ -98,7 +98,7 @@ public class HelloWorldClient {
 		CheckBalanceRequest checkBalanceRequest;
 		CheckBalanceReply checkBalanceReply;
 		try {
-			checkBalanceRequest = CheckBalanceRequest.newBuilder().setAddress(createWalletResponse.getAddress())
+			checkBalanceRequest = CheckBalanceRequest.newBuilder().setAddress(createKeyWalletResponse.getAddress())
 					.build();
 			checkBalanceReply = blockingStub.checkBalance(checkBalanceRequest);
 		} catch (StatusRuntimeException e) {
@@ -110,7 +110,7 @@ public class HelloWorldClient {
 		SendIcxRequest sendIcxRequest;
 		SendIcxReply sendIcxReply;
 		try {
-			sendIcxRequest = SendIcxRequest.newBuilder().setPrivatekey(createWalletResponse.getPrivatekey()).build();
+			sendIcxRequest = SendIcxRequest.newBuilder().setPrivatekey(createKeyWalletResponse.getPrivatekey()).build();
 			sendIcxReply = blockingStub.sendICX(sendIcxRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
