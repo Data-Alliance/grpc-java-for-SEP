@@ -83,10 +83,23 @@ public class HelloWorldClient {
 		logger.info("did: " + createWalletResponse.getDid());
 		logger.info("address: " + createWalletResponse.getAddress());
 
+		CreateKeystorefileRequest createKeystorefileRequest;
+		CreateKeystorefileReply createKeystorefileResponse;
+		try {
+			createKeystorefileRequest = CreateKeystorefileRequest.newBuilder()
+					.setPrivatekey(createWalletResponse.getPrivatekey()).setPassword("Pa55w0rd").build();
+			createKeystorefileResponse = blockingStub.createKeystoreFile(createKeystorefileRequest);
+		} catch (StatusRuntimeException e) {
+			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+			return;
+		}
+		logger.info("keystorefile: " + createKeystorefileResponse.getKeystorefile());
+
 		CheckBalanceRequest checkBalanceRequest;
 		CheckBalanceReply checkBalanceReply;
 		try {
-			checkBalanceRequest = CheckBalanceRequest.newBuilder().setAddress(createWalletResponse.getAddress()).build();
+			checkBalanceRequest = CheckBalanceRequest.newBuilder().setAddress(createWalletResponse.getAddress())
+					.build();
 			checkBalanceReply = blockingStub.checkBalance(checkBalanceRequest);
 		} catch (StatusRuntimeException e) {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());

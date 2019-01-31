@@ -16,6 +16,9 @@
 
 package io.grpc.examples.helloworld;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.logging.Logger;
@@ -23,6 +26,7 @@ import java.util.logging.Logger;
 import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
 import foundation.icon.icx.data.Address;
+import foundation.icon.icx.data.Bytes;
 import foundation.icon.icx.transport.http.HttpProvider;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -104,6 +108,41 @@ public class HelloWorldServer {
 						.setPublickey(createdWallet.getPublicKey().toHexString(false))
 						.setDid(createdWallet.getPublicKey().toHexString(false))
 						.setAddress(createdWallet.getAddress().toString()).build();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			responseObserver.onNext(reply);
+			responseObserver.onCompleted();
+		}
+
+		@Override
+		public void createKeystoreFile(CreateKeystorefileRequest req,
+				StreamObserver<CreateKeystorefileReply> responseObserver) {
+			CreateKeystorefileReply reply = CreateKeystorefileReply.newBuilder().setKeystorefile("").build();
+
+			// Create keyWallet and store it as a keyStorefile
+			System.out.println("Create KeyWallet");
+
+			String dirPath = "./";
+			// File of directory for keystorfile.
+			File destinationDirectory = new File(dirPath);
+
+			try {
+				KeyWallet wallet = KeyWallet.load(new Bytes(req.getPrivatekey()));
+				String fileName = KeyWallet.store(wallet, req.getPassword(), destinationDirectory);
+				BufferedReader br;
+				String keyStorefile = "";
+
+				File file = new File(destinationDirectory, fileName);
+				if (file.exists() && file.isFile() && file.canRead()) {
+					// ObjectMapper mapper = new ObjectMapper();
+					// KeystoreFile keystoreFile = mapper.readValue(file, KeystoreFile.class);
+					br = new BufferedReader(new FileReader(file));
+					keyStorefile = br.readLine();
+				}
+				logger.info("keyStorefile: " + keyStorefile);
+				reply = CreateKeystorefileReply.newBuilder().setKeystorefile(keyStorefile).build();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

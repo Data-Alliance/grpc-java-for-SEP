@@ -28,6 +28,9 @@ service Greeter {
   // Create wallet
   rpc CreateWallet (CreateWalletRequest) returns (CreateWalletReply) {}
 
+  // Create keystore flie
+  rpc CreateKeystoreFile (CreateKeystorefileRequest) returns (CreateKeystorefileReply) {}
+
   // Check balance
   rpc CheckBalance (CheckBalanceRequest) returns (CheckBalanceReply) {}
 
@@ -54,6 +57,16 @@ message CreateWalletReply {
   string publickey = 2;
   string did = 3;
   string address = 4;
+}
+
+// The request message containing the user's private key & password.
+message CreateKeystorefileRequest {
+  string privatekey = 1;
+  string password = 2;
+}
+// The response message containing the keystorefile.
+message CreateKeystorefileReply {
+  string keystorefile = 1;
 }
 
 // The request message containing the user's private key.
