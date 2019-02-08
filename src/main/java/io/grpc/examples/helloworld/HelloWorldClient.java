@@ -124,7 +124,7 @@ public class HelloWorldClient {
 	 * use in the greeting.
 	 */
 	public static void main(String[] args) throws Exception {
-		HelloWorldClient client = new HelloWorldClient("localhost", 50051);
+		HelloWorldClient client = new HelloWorldClient("54.180.150.120", 50051);
 		try {
 			/* Access a service running on the local machine on port 50051 */
 			String user = "world";
