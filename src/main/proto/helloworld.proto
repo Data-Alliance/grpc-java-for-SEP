@@ -36,6 +36,9 @@ service Greeter {
 
   // Send ICX
   rpc SendICX (SendIcxRequest) returns (SendIcxReply) {}
+
+  // Create DID
+  rpc CreateDID (CreateDIDRequest) returns (CreateDIDReply) {}
 }
 
 // The request message containing the user's name.
@@ -86,6 +89,15 @@ message SendIcxRequest {
 }
 // The response message containing the balance.
 message SendIcxReply {
+  string message = 1;
+}
+
+// The request message containing the user's private key & send to address.
+message CreateDIDRequest {
+  string publickey = 1;
+}
+// The response message containing the balance.
+message CreateDIDReply {
   string message = 1;
 }
 

@@ -23,11 +23,19 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.logging.Logger;
 
+import foundation.icon.icx.Call;
 import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
+import foundation.icon.icx.SignedTransaction;
+import foundation.icon.icx.Transaction;
+import foundation.icon.icx.TransactionBuilder;
 import foundation.icon.icx.data.Address;
 import foundation.icon.icx.data.Bytes;
+import foundation.icon.icx.data.IconAmount;
 import foundation.icon.icx.transport.http.HttpProvider;
+import foundation.icon.icx.transport.jsonrpc.RpcItem;
+import foundation.icon.icx.transport.jsonrpc.RpcObject;
+import foundation.icon.icx.transport.jsonrpc.RpcValue;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -39,6 +47,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
  */
 public class HelloWorldServer {
 	private static final Logger logger = Logger.getLogger(HelloWorldServer.class.getName());
+	private static IconService iconService;
 
 	private Server server;
 
@@ -103,7 +112,8 @@ public class HelloWorldServer {
 			try {
 				createdWallet = KeyWallet.create();
 				logger.info("address: " + createdWallet.getAddress());
-				reply = CreateKeyWalletReply.newBuilder().setPrivatekey(createdWallet.getPrivateKey().toHexString(false))
+				reply = CreateKeyWalletReply.newBuilder()
+						.setPrivatekey(createdWallet.getPrivateKey().toHexString(false))
 						.setPublickey(createdWallet.getPublicKey().toHexString(false))
 						.setDid(createdWallet.getPublicKey().toHexString(false))
 						.setAddress(createdWallet.getAddress().toString()).build();
@@ -159,7 +169,7 @@ public class HelloWorldServer {
 			OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
 			IconService iconService = new IconService(new HttpProvider(httpClient, CommonData.URI4testnet));
 
-			Address address = new Address("hx11ff20b38b81f2c33ac61c3b9037f94cca167e7c");
+			Address address = new Address(req.getAddress());
 			BigInteger balance;
 			try {
 				balance = iconService.getBalance(address).execute();
@@ -177,6 +187,69 @@ public class HelloWorldServer {
 		@Override
 		public void sendICX(SendIcxRequest req, StreamObserver<SendIcxReply> responseObserver) {
 			SendIcxReply reply = SendIcxReply.newBuilder().setMessage("Send ICX result = ").build();
+
+			final Address scoreAddress = new Address("cx6775fe9c32444a917f854f4a53fa08d763127c79");
+
+			HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+			logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+			OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
+			IconService iconService = new IconService(new HttpProvider(httpClient, CommonData.URI4testnet));
+
+			Call<RpcItem> call = new Call.Builder().to(scoreAddress).method("create_did").build();
+
+			try {
+				RpcItem result = iconService.call(call).execute();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			responseObserver.onNext(reply);
+			responseObserver.onCompleted();
+		}
+
+		@Override
+		public void createDID(CreateDIDRequest req, StreamObserver<CreateDIDReply> responseObserver) {
+			CreateDIDReply reply = CreateDIDReply.newBuilder().setMessage("Send ICX result = ").build();
+
+			KeyWallet wallet = KeyWallet
+					.load(new Bytes("1915704752ee6e926e15e938d2d8153957fb8d43724a5f61a129ddd1fbb9884d"));
+			Address fromAddress = wallet.getAddress();
+			Address scoreAddress = new Address("cxd6bdebfbba1b35141fdade2a5f806d618c713369");
+
+			BigInteger networkId = new BigInteger("3");
+			BigInteger value = IconAmount.of("0", IconAmount.Unit.ICX).toLoop();
+			BigInteger stepLimit = new BigInteger("1000000");
+			long timestamp = System.currentTimeMillis() * 1000L;
+			BigInteger nonce = new BigInteger("1");
+
+			RpcObject params = new RpcObject.Builder().put("publickey", new RpcValue(req.getPublickey())).build();
+
+			Transaction transaction = TransactionBuilder.newBuilder()
+					.nid(networkId)
+					.from(fromAddress)
+					.to(scoreAddress)
+					.value(value)
+					.stepLimit(stepLimit)
+					.timestamp(new BigInteger(Long.toString(timestamp)))
+					.nonce(nonce)
+					.call("create_did_from_pubkey")
+					.params(params)
+					.build();
+
+			SignedTransaction signedTransaction = new SignedTransaction(transaction, wallet);
+
+			HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+			logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+			OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
+			iconService = new IconService(new HttpProvider(httpClient, CommonData.URI4testnet));
+			try {
+				Bytes hash = iconService.sendTransaction(signedTransaction).execute();
+				System.out.println("txHash:" + hash);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
 		}

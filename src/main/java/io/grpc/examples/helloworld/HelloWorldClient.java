@@ -78,9 +78,8 @@ public class HelloWorldClient {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("pv key: " + createKeyWalletResponse.getPrivatekey());
+		logger.info("\n\npv key: " + createKeyWalletResponse.getPrivatekey());
 		logger.info("pb key: " + createKeyWalletResponse.getPublickey());
-		logger.info("did: " + createKeyWalletResponse.getDid());
 		logger.info("address: " + createKeyWalletResponse.getAddress());
 
 		CreateKeystoreFileRequest createKeystorefileRequest;
@@ -93,7 +92,7 @@ public class HelloWorldClient {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("keystorefile: " + createKeystorefileResponse.getKeystorefile());
+		logger.info("\nkeystorefile: " + createKeystorefileResponse.getKeystorefile());
 
 		CheckBalanceRequest checkBalanceRequest;
 		CheckBalanceReply checkBalanceReply;
@@ -105,7 +104,7 @@ public class HelloWorldClient {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("check balance: " + checkBalanceReply.getBalance());
+		logger.info("\ncheck balance: " + checkBalanceReply.getBalance());
 
 		SendIcxRequest sendIcxRequest;
 		SendIcxReply sendIcxReply;
@@ -116,7 +115,19 @@ public class HelloWorldClient {
 			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
 			return;
 		}
-		logger.info("send ICX: " + sendIcxReply.getMessage());
+		logger.info("\nsend ICX: " + sendIcxReply.getMessage());
+		
+		CreateDIDRequest createDIDRequest;
+		CreateDIDReply createDIDReply;
+		try {
+			createDIDRequest = CreateDIDRequest.newBuilder().setPublickey(createKeyWalletResponse.getPublickey()).build();
+			createDIDReply = blockingStub.createDID(createDIDRequest);
+		} catch (StatusRuntimeException e) {
+			logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+			return;
+		}
+		logger.info("\n   Create DID: " + createDIDReply.getMessage());
+		
 	}
 
 	/**
@@ -124,7 +135,9 @@ public class HelloWorldClient {
 	 * use in the greeting.
 	 */
 	public static void main(String[] args) throws Exception {
-		HelloWorldClient client = new HelloWorldClient("54.180.150.120", 50051);
+		String server_address = "localhost";
+		// String server_address = "54.180.150.120";
+		HelloWorldClient client = new HelloWorldClient(server_address, 50051);
 		try {
 			/* Access a service running on the local machine on port 50051 */
 			String user = "world";
